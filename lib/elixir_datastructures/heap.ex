@@ -4,9 +4,9 @@ defmodule Heap do
 
   # Client 
   def start_link, do: GenServer.start_link(__MODULE__, %Heap{}, name: ElixirHeap)
-  def start_link(item), do: GenServer.start_link(__MODULE__, _heap_from_key(item), name: ElixirHeap)
   def start_link(list) when is_list(list),
     do: GenServer.start_link(__MODULE__, _from_list(list), name: ElixirHeap)
+  def start_link(item), do: GenServer.start_link(__MODULE__, _heap_from_key(item), name: ElixirHeap)
 
   def min(), do: GenServer.call(ElixirHeap, :min)
 
@@ -52,7 +52,7 @@ defmodule Heap do
   def _rank(%Heap{rank: rank}), do: rank
   def _rank(nil), do: 0
 
-  def _heap_from_key(key) when key > 0, do: %Heap{key: key, rank: 1}
+  def _heap_from_key(key) when is_integer(key), do: %Heap{key: key, rank: 1}
 
   def _merge(nil, nil), do: %Heap{}
   def _merge(%Heap{} = heap, nil), do: heap
