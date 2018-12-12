@@ -19,16 +19,16 @@ defmodule Heap do
       iex> Heap.rank(nil)
       0
   """
-  def _rank(%Heap{rank: rank}), do: rank
-  def _rank(nil), do: 0
+  def rank(%Heap{rank: rank}), do: rank
+  def rank(nil), do: 0
 
-  def _heap_from_key(key) when is_integer(key), do: %Heap{key: key, rank: 1}
+  def heap_from_key(key) when is_integer(key), do: %Heap{key: key, rank: 1}
 
-  def _merge(nil, nil), do: nil
-  def _merge(%Heap{} = heap, nil), do: heap
-  def _merge(nil, %Heap{} = heap), do: heap
+  def merge(nil, nil), do: nil
+  def merge(%Heap{} = heap, nil), do: heap
+  def merge(nil, %Heap{} = heap), do: heap
 
-  def _merge(%Heap{left: left, right: right, key: key1} = h1, %Heap{key: key2} = h2) do
+  def merge(%Heap{left: left, right: right, key: key1} = h1, %Heap{key: key2} = h2) do
     if key1 > key2 do
       _merge(h2, h1)
     else
@@ -44,24 +44,24 @@ defmodule Heap do
     end
   end
 
-  def _insert(heap, list) when is_list(list), do: list |> _from_list() |> _merge(heap)
-  def _insert(heap, key), do: key |> _heap_from_key() |> _merge(heap)
+  def insert(heap, list) when is_list(list), do: list |> _from_list() |> _merge(heap)
+  def insert(heap, key), do: key |> _heap_from_key() |> _merge(heap)
 
-  def _get_min(%Heap{key: key}), do: key
-  def _get_min(nil), do: :empty
+  def get_min(%Heap{key: key}), do: key
+  def get_min(nil), do: :empty
 
-  def _delete_min(%Heap{right: right, left: left, key: key}), do: {:ok, key, _merge(right, left)}
-  def _delete_min(nil), do: {:err, :empty}
+  def delete_min(%Heap{right: right, left: left, key: key}), do: {:ok, key, _merge(right, left)}
+  def delete_min(nil), do: {:err, :empty}
 
-  def _to_list(%Heap{} = heap), do: _to_list([], heap)
-  def _to_list(list, nil), do: Enum.reverse(list)
+  def to_list(%Heap{} = heap), do: _to_list([], heap)
+  def to_list(list, nil), do: Enum.reverse(list)
 
-  def _to_list(list, %Heap{} = heap) do
+  def to_list(list, %Heap{} = heap) do
     {:ok, min, new_heap} = _delete_min(heap)
     _to_list([min | list], new_heap)
   end
 
-  def _from_list([head | list]), do: _from_list(list, _heap_from_key(head))
-  def _from_list([head | tail], %Heap{} = heap), do: _from_list(tail, _insert(heap, head))
-  def _from_list([], %Heap{} = heap), do: heap
+  def from_list([head | list]), do: _from_list(list, _heap_from_key(head))
+  def from_list([head | tail], %Heap{} = heap), do: _from_list(tail, _insert(heap, head))
+  def from_list([], %Heap{} = heap), do: heap
 end
