@@ -43,7 +43,7 @@ defmodule Heap do
   @impl true
   def handle_cast(:delete_min, heap) do
     case _delete_min(heap) do
-      {:ok, _, new_heap} -> {:noreply, new_heap}
+      {:ok, _removed, new_heap} -> {:noreply, new_heap}
       _ -> {:noreply, heap}
     end
   end
@@ -54,11 +54,11 @@ defmodule Heap do
 
   def _heap_from_key(key) when is_integer(key), do: %Heap{key: key, rank: 1}
 
-  def _merge(nil, nil), do: %Heap{}
+  def _merge(nil, nil), do: nil
   def _merge(%Heap{} = heap, nil), do: heap
   def _merge(nil, %Heap{} = heap), do: heap
   def _merge(%Heap{left: left, right: right, key: key1} = h1, %Heap{key: key2} = h2) do
-    if h1.key > h2.key do
+    if key1 > key2 do
       _merge(h2, h1)
     else
       merged = _merge(right, h2)
@@ -75,18 +75,17 @@ defmodule Heap do
   def _insert(heap, list) when is_list(list), do: list |> _from_list() |> _merge(heap)
   def _insert(heap, key), do: key |> _heap_from_key() |> _merge(heap)
 
-  def _get_min(%Heap{key: key}) when key <= 0, do: :empty
   def _get_min(%Heap{key: key}), do: key
+  def _get_min(nil), do: :empty
 
-  def _delete_min(%Heap{key: key}) when key <= 0, do: {:err, :empty}
   def _delete_min(%Heap{right: right, left: left, key: key}), do: {:ok, key, _merge(right, left)}
+  def _delete_min(nil), do: {:err, :empty}
 
   def _to_list(%Heap{} = heap), do: _to_list([], heap)
+  def _to_list(list, nil), do: Enum.reverse(list)
   def _to_list(list, %Heap{} = heap) do
-    case _delete_min(heap) do
-      {:ok, min, new_heap} -> _to_list([min | list], new_heap)
-      {:err, _} -> Enum.reverse(list)
-    end
+    {:ok, min, new_heap} = _delete_min(heap)
+    _to_list([min | list], new_heap)
   end
 
   def _from_list(list) when is_list(list), do: _from_list(list, %Heap{})
