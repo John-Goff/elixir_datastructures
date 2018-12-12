@@ -3,22 +3,22 @@ defmodule Heap do
   defstruct left: nil, key: 0, right: nil, rank: 0
 
   # Client 
-  def start_link, do: GenServer.start_link(__MODULE__, %Heap{}, name: HiredHippoHeap)
-  def start_link(item), do: GenServer.start_link(__MODULE__, _heap_from_key(item), name: HiredHippoHeap)
+  def start_link, do: GenServer.start_link(__MODULE__, %Heap{}, name: ElixirHeap)
+  def start_link(item), do: GenServer.start_link(__MODULE__, _heap_from_key(item), name: ElixirHeap)
   def start_link(list) when is_list(list),
-    do: GenServer.start_link(__MODULE__, _from_list(list), name: HiredHippoHeap)
+    do: GenServer.start_link(__MODULE__, _from_list(list), name: ElixirHeap)
 
-  def min(), do: GenServer.call(HiredHippoHeap, :min)
+  def min(), do: GenServer.call(ElixirHeap, :min)
 
-  def size(), do: GenServer.call(HiredHippoHeap, :size)
+  def size(), do: GenServer.call(ElixirHeap, :size)
 
-  def to_list(), do: GenServer.call(HiredHippoHeap, :to_list)
+  def to_list(), do: GenServer.call(ElixirHeap, :to_list)
 
-  def insert(item), do: GenServer.cast(HiredHippoHeap, {:insert, item})
+  def insert(item), do: GenServer.cast(ElixirHeap, {:insert, item})
 
   def remove() do
     minimum = min()
-    case GenServer.cast(HiredHippoHeap, :delete_min) do
+    case GenServer.cast(ElixirHeap, :delete_min) do
       :ok -> {:ok, minimum}
       other -> {other}
     end

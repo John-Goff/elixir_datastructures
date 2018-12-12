@@ -3,12 +3,12 @@ defmodule StackTwo do
 
   # Client Functions
   def start_link(default) when is_list(default) do
-    GenServer.start_link(__MODULE__, default, name: HiredHippoStack)
+    GenServer.start_link(__MODULE__, default, name: ElixirStack)
   end
 
-  def push(item), do: GenServer.cast(HiredHippoStack, {:push, item})
+  def push(item), do: GenServer.cast(ElixirStack, {:push, item})
 
-  def pop(), do: GenServer.call(HiredHippoStack, :pop)
+  def pop(), do: GenServer.call(ElixirStack, :pop)
 
   # Callbacks
   @impl true

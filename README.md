@@ -1,6 +1,13 @@
 # ElixirDatastructures
 
-**TODO: Add description**
+Some datastructure implementations in elixir, with an accompanying lesson plan for teaching these
+structures (and Elixir itself) to beginners.
+
+Note that this plan is scattered, follows my train of thought and probably shouldn't be heavily
+relied on.
+
+Thse datastructures have not been tested in a production envionment and you shouldn't use them for
+anything important.
 
 ## Installation
 
