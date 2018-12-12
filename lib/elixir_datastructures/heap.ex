@@ -88,8 +88,7 @@ defmodule Heap do
     _to_list([min | list], new_heap)
   end
 
-  def _from_list(list) when is_list(list), do: _from_list(list, %Heap{})
-  def _from_list([], %Heap{} = heap), do: heap
-  def _from_list([head], %Heap{} = heap), do: _from_list([], _insert(heap, head))
+  def _from_list([head | list]), do: _from_list(list, _heap_from_key(head))
   def _from_list([head | tail], %Heap{} = heap), do: _from_list(tail, _insert(heap, head))
+  def _from_list([], %Heap{} = heap), do: heap
 end
