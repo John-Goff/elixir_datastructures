@@ -1,24 +1,60 @@
 defmodule Heap do
-  @moduledoc """
-  Elixir implementation of a leftist tree.
-  Leaves are represented by nil. Based on the OCaml implementation available [here](http://typeocaml.com/2015/03/12/heap-leftist-tree/)
-  """
+  use GenServer
+  # Struct implementing a leftist tree. Leaves are represented by nil.
   defstruct left: nil, key: 0, right: nil, rank: 0
 
-  @doc """
-  Gets the rank of a heap.
+  # Client 
+  def start_link,
+    do: GenServer.start_link(__MODULE__, %Heap{}, name: ElixirHeap)
 
-  Returns the number representing the distance between the node and the rightmost leaf.
-  Will return 0 for a leaf.
+  def start_link(list) when is_list(list),
+    do: GenServer.start_link(__MODULE__, _from_list(list), name: ElixirHeap)
 
-  ## Examples
-  
-      iex> Heap.rank(%Heap{rank: 2})
-      2
+  def start_link(item),
+    do: GenServer.start_link(__MODULE__, _heap_from_key(item), name: ElixirHeap)
 
-      iex> Heap.rank(nil)
-      0
-  """
+  def min(), do: GenServer.call(ElixirHeap, :min)
+
+  def size(), do: GenServer.call(ElixirHeap, :size)
+
+  def to_list(), do: GenServer.call(ElixirHeap, :to_list)
+
+  def insert(item), do: GenServer.cast(ElixirHeap, {:insert, item})
+
+  def remove() do
+    minimum = min()
+
+    case GenServer.cast(ElixirHeap, :delete_min) do
+      :ok -> {:ok, minimum}
+      other -> {other}
+    end
+  end
+
+  # Callbacks
+  @impl true
+  def init(%Heap{}), do: {:ok, %Heap{}}
+
+  @impl true
+  def handle_call(:size, _from, heap), do: {:reply, length(_to_list(heap)), heap}
+
+  @impl true
+  def handle_call(:min, _from, heap), do: {:reply, _get_min(heap), heap}
+
+  @impl true
+  def handle_call(:to_list, _from, heap), do: {:reply, _to_list(heap), heap}
+
+  @impl true
+  def handle_cast({:insert, item}, heap), do: {:noreply, _insert(heap, item)}
+
+  @impl true
+  def handle_cast(:delete_min, heap) do
+    case _delete_min(heap) do
+      {:ok, _removed, new_heap} -> {:noreply, new_heap}
+      _ -> {:noreply, heap}
+    end
+  end
+
+  # Implementation of leftist heap data structure, loosely based on: http://typeocaml.com/2015/03/12/heap-leftist-tree/
   def _rank(%Heap{rank: rank}), do: rank
   def _rank(nil), do: 0
 
