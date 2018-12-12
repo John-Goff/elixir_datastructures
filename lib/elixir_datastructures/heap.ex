@@ -12,9 +12,9 @@ defmodule LeftistHeap do
   Will return 0 for a leaf.
 
   ## Examples
-  iex> Heap.rank(%Heap{rank: 2})
+  iex> LeftistHeap.rank(%LeftistHeap{rank: 2})
   2
-  iex> Heap.rank(nil)
+  iex> LeftistHeap.rank(nil)
   0
   """
   def rank(%LeftistHeap{rank: rank}), do: rank
@@ -24,8 +24,8 @@ defmodule LeftistHeap do
   Creates a new heap with the given key.
 
   ## Examples
-  iex> Heap.from_key(1)
-  %Heap{key: 1, rank: 1}
+  iex> LeftistHeap.from_key(1)
+  %LeftistHeap{key: 1, rank: 1}
   """
   def from_key(key) when is_integer(key), do: %LeftistHeap{key: key, rank: 1}
 
@@ -122,13 +122,7 @@ defmodule LeftistHeap do
 
   ## Examples
   iex> LeftistHeap.from_list([1, 2, 3])
-  %LeftistHeap{
-    key: 1, rank: 1, left: %LeftistHeap{
-      key: 2, rank: 1, left: %LeftistHeap{
-        key: 3, rank: 1
-      }
-    }
-  }
+  %LeftistHeap{key: 1, rank: 2, left: %LeftistHeap{key: 2, rank: 1}, right: %LeftistHeap{key: 3, rank: 1}}
   """
   def from_list([head | list]), do: from_list(list, from_key(head))
   # Recursive implementation of from_list. Pops the first element off a list and adds it to
