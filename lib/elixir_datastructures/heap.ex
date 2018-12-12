@@ -3,10 +3,14 @@ defmodule Heap do
   defstruct left: nil, key: 0, right: nil, rank: 0
 
   # Client 
-  def start_link, do: GenServer.start_link(__MODULE__, %Heap{}, name: ElixirHeap)
+  def start_link,
+    do: GenServer.start_link(__MODULE__, %Heap{}, name: ElixirHeap)
+
   def start_link(list) when is_list(list),
     do: GenServer.start_link(__MODULE__, _from_list(list), name: ElixirHeap)
-  def start_link(item), do: GenServer.start_link(__MODULE__, _heap_from_key(item), name: ElixirHeap)
+
+  def start_link(item),
+    do: GenServer.start_link(__MODULE__, _heap_from_key(item), name: ElixirHeap)
 
   def min(), do: GenServer.call(ElixirHeap, :min)
 
@@ -18,6 +22,7 @@ defmodule Heap do
 
   def remove() do
     minimum = min()
+
     case GenServer.cast(ElixirHeap, :delete_min) do
       :ok -> {:ok, minimum}
       other -> {other}
@@ -57,6 +62,7 @@ defmodule Heap do
   def _merge(nil, nil), do: nil
   def _merge(%Heap{} = heap, nil), do: heap
   def _merge(nil, %Heap{} = heap), do: heap
+
   def _merge(%Heap{left: left, right: right, key: key1} = h1, %Heap{key: key2} = h2) do
     if key1 > key2 do
       _merge(h2, h1)
@@ -64,6 +70,7 @@ defmodule Heap do
       merged = _merge(right, h2)
       rank_left = _rank(left)
       rank_right = _rank(merged)
+
       if rank_left >= rank_right do
         %Heap{h1 | right: merged, rank: rank_right + 1}
       else
@@ -83,6 +90,7 @@ defmodule Heap do
 
   def _to_list(%Heap{} = heap), do: _to_list([], heap)
   def _to_list(list, nil), do: Enum.reverse(list)
+
   def _to_list(list, %Heap{} = heap) do
     {:ok, min, new_heap} = _delete_min(heap)
     _to_list([min | list], new_heap)
