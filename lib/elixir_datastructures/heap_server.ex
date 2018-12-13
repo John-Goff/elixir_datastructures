@@ -29,7 +29,6 @@ defmodule HeapServer do
 
   @impl true
   def code_change(vsn, {_module, heap}, extra) do
-    IO.inspect vsn
     {old_module, new_module} = case vsn do
       1 -> {LeftistHeap, BinaryHeap}
       {:down, 2} -> {BinaryHeap, LeftistHeap}

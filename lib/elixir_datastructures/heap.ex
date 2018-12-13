@@ -64,6 +64,7 @@ defmodule LeftistHeap do
   [2, 4]
   ```
   """
+  def to_list(nil), do: []
   def to_list(%LeftistHeap{} = heap), do: to_list([], heap)
 
   # Recursive base case, when we hit a leaf we reverse the list we've built by cons
