@@ -9,6 +9,7 @@ defmodule BinaryHeap do
 
   defstruct min: 0, left: :leaf, right: :leaf, size: 0, height: 0
 
+  # Constructor for heaps that preserves the size and height properties
   defp _heap(min, left \\ :leaf, right \\ :leaf), do: %BinaryHeap{
     min: min,
     left: left,
@@ -22,8 +23,8 @@ defmodule BinaryHeap do
 
   ## Examples
   ```
-  iex> LeftistHeap.from_key(1)
-  %LeftistHeap{key: 1, rank: 1}
+  iex> BinaryHeap.from_key(1)
+  %BinaryHeap{key: 1, rank: 1}
   ```
   """
   def from_key(min) when is_integer(min), do: _heap(min)
@@ -33,8 +34,8 @@ defmodule BinaryHeap do
 
   ## Examples
   ```
-  iex> LeftistHeap.from_list([1, 2, 3])
-  %LeftistHeap{key: 1, rank: 2, left: %LeftistHeap{key: 2, rank: 1}, right: %LeftistHeap{key: 3, rank: 1}}
+  iex> BinaryHeap.from_list([1, 2, 3])
+  %BinaryHeap{key: 1, rank: 2, left: %BinaryHeap{key: 2, rank: 1}, right: %BinaryHeap{key: 3, rank: 1}}
   ```
   """
   def from_list(list) when is_list(list), do: from_list(list, 0)
@@ -50,8 +51,8 @@ defmodule BinaryHeap do
 
   ## Examples
   ```
-  iex> LeftistHeap.from_list([1, 2, 3])
-  %LeftistHeap{key: 1, rank: 2, left: %LeftistHeap{key: 2, rank: 1}, right: %LeftistHeap{key: 3, rank: 1}}
+  iex> BinaryHeap.from_list([1, 2, 3])
+  %BinaryHeap{key: 1, rank: 2, left: %BinaryHeap{key: 2, rank: 1}, right: %BinaryHeap{key: 3, rank: 1}}
   ```
   """
   def get_min(%BinaryHeap{min: min}), do: min
@@ -61,7 +62,7 @@ defmodule BinaryHeap do
   Returns the size of the heap
 
   ## Dxamples
-  iex> [1, 2, 3] |> LeftistHeap.from_list() |> LeftistHeap.size()
+  iex> [1, 2, 3] |> BinaryHeap.from_list() |> BinaryHeap.size()
   3
   """
   def size(%BinaryHeap{size: size}), do: size
@@ -72,7 +73,7 @@ defmodule BinaryHeap do
 
   ## Examples
   ```
-  iex> LeftistHeap.from_key(2) |> LeftistHeap.insert(4) |> LeftistHeap.to_list
+  iex> BinaryHeap.from_key(2) |> BinaryHeap.insert(4) |> BinaryHeap.to_list
   [2, 4]
   ```
   """
@@ -90,12 +91,12 @@ defmodule BinaryHeap do
 
   ## Examples
   ```
-  iex> LeftistHeap.from_key(1) |> LeftistHeap.insert(2)
-  %LeftistHeap{key: 1, rank: 1, left: %LeftistHeap{key: 2, rank: 1}}
-  iex> LeftistHeap.from_key(1) |> LeftistHeap.insert([2, 3])
-  %LeftistHeap{
-    key: 1, rank: 1, left: %LeftistHeap{
-      key: 2, rank: 1, left: %LeftistHeap{
+  iex> BinaryHeap.from_key(1) |> BinaryHeap.insert(2)
+  %BinaryHeap{key: 1, rank: 1, left: %BinaryHeap{key: 2, rank: 1}}
+  iex> BinaryHeap.from_key(1) |> BinaryHeap.insert([2, 3])
+  %BinaryHeap{
+    key: 1, rank: 1, left: %BinaryHeap{
+      key: 2, rank: 1, left: %BinaryHeap{
         key: 3, rank: 1
       }
     }
@@ -121,9 +122,9 @@ defmodule BinaryHeap do
 
   ## Examples
   ```
-  iex> LeftistHeap.from_list([4, 2, 5]) |> LeftistHeap.delete_min()
-  {:ok, 2, %LeftistHeap{key: 4, rank: 1, left: %LeftistHeap{key: 5, rank: 1}}}
-  iex> LeftistHeap.delete_min(nil)
+  iex> BinaryHeap.from_list([4, 2, 5]) |> BinaryHeap.delete_min()
+  {:ok, 2, %BinaryHeap{key: 4, rank: 1, left: %BinaryHeap{key: 5, rank: 1}}}
+  iex> BinaryHeap.delete_min(nil)
   {:err, :empty}
   ```
   """
