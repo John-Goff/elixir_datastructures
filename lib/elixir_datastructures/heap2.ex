@@ -27,7 +27,7 @@ defmodule BinaryHeap do
   %BinaryHeap{min: 1, size: 1, height: 1}
   ```
   """
-  def from_key(min) when is_integer(min), do: _heap(min)
+  def from_key(min) when is_number(min), do: _heap(min)
 
   @doc """
   Creates a heap from a list.
@@ -97,8 +97,8 @@ defmodule BinaryHeap do
   %BinaryHeap{min: 1, size: 2, height: 2, left: %BinaryHeap{min: 2, size: 1, height: 1}}
   ```
   """
-  def insert(:leaf, item) when is_integer(item), do: _heap(item)
-  def insert(%BinaryHeap{left: left, right: right, min: min}, item) when is_integer(item) do
+  def insert(:leaf, item) when is_number(item), do: _heap(item)
+  def insert(%BinaryHeap{left: left, right: right, min: min}, item) when is_number(item) do
     cond do
       size(left) < :math.pow(2, height(left)) - 1 ->
         bubble_up(min, insert(left, item), right)
@@ -198,7 +198,7 @@ defmodule BinaryHeap do
   defimpl Collectable do
     def into(original) do
       {original, fn
-        heap, {:cont, x} when is_integer(x) -> BinaryHeap.insert(heap, x)
+        heap, {:cont, x} when is_number(x) -> BinaryHeap.insert(heap, x)
         heap, :done -> heap
         _, :halt -> :ok
       end}
