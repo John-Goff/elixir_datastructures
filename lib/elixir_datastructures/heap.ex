@@ -36,8 +36,10 @@ defmodule LeftistHeap do
   Return the smallest element in the heap
 
   ## Examples
+  ```
   iex> [3, 7, 2, 4, 7, 1] |> LeftistHeap.from_list() |> LeftistHeap.get_min()
   1
+  ```
   """
   def get_min(%LeftistHeap{key: key}), do: key
   def get_min(nil), do: :empty
@@ -45,9 +47,11 @@ defmodule LeftistHeap do
   @doc """
   Returns the size of the heap
 
-  ## Dxamples
+  ## Examples
+  ```
   iex> [1, 2, 3] |> LeftistHeap.from_list() |> LeftistHeap.size()
   3
+  ```
   """
   def size(heap), do: heap |> to_list() |> length()
 
