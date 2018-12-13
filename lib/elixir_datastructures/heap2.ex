@@ -213,9 +213,11 @@ defmodule BinaryHeap do
       cond do
         item < min -> false
         item === min -> true
+        item === BinaryHeap.get_min(left) -> true
+        item === BinaryHeap.get_min(right) -> true
+        BinaryHeap.get_min(left) < BinaryHeap.get_min(right) and BinaryHeap.get_min(left) < item -> member?(left, item)
         BinaryHeap.get_min(right) < item -> member?(right, item)
-        BinaryHeap.get_min(left) < item -> member?(left, item)
-        true -> {:error, __MODULE__}
+        true -> false
       end
     end
 
@@ -229,6 +231,18 @@ defmodule BinaryHeap do
 
     def slice(heap), do: {:error, __MODULE__}
   end
+end
+
+defimpl Enumerable, for: Atom do
+  def count(:leaf), do: 0
+
+  def member?(:leaf, item), do: false
+
+  def reduce(_heap, {:halt, acc}, _fun), do: {:halted, acc}
+  def reduce(heap, {:suspend, acc}, fun), do: {:suspended, acc, &reduce(heap, &1, fun)}
+  def reduce(:leaf, {:cont, acc}, _fun), do: {:done, acc}
+
+  def slice(heap), do: {:error, __MODULE__}
 end
 
 defimpl Collectable, for: Atom do
