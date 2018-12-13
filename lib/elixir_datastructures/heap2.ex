@@ -67,12 +67,13 @@ defmodule BinaryHeap do
   end
 
   def delete_min(:leaf), do: {:err, :leaf}
-  def delete_min(%BinaryHeap{left: left, right: right}) do
-    case merge_children(left, right) do
+  def delete_min(%BinaryHeap{min: min, left: left, right: right}) do
+    new_heap = case merge_children(left, right) do
       :leaf -> :leaf
       %BinaryHeap{min: min, left: leftT, right: rightT} ->
         bubble_down(min, leftT, rightT)
     end
+    {:ok, min, new_heap}
   end
 
   def merge_children(:leaf, :leaf), do: :leaf
