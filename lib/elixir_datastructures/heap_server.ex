@@ -1,6 +1,8 @@
 defmodule HeapServer do
   use GenServer
 
+  @vsn 1
+
   ## Client 
 
   def start_link(module \\ LeftistHeap, heap \\ nil),
@@ -25,21 +27,18 @@ defmodule HeapServer do
 
   ## Callbacks
 
-  # @impl true
-  # def code_change(_vsn, {_module, heap}, extra) do
-  #   new_heap = heap
-  #   |> LeftistHeap.to_list()
-  #   |> BinaryHeap.from_list()
-  #   {:ok, {BinaryHeap, new_heap}}
-  # end
-
-  # @impl true
-  # def code_change(_vsn, {_module, heap}, extra) do
-  #   new_heap = heap
-  #   |> BinaryHeap.to_list()
-  #   |> LeftistHeap.from_list()
-  #   {:ok, {LeftistHeap, new_heap}}
-  # end
+  @impl true
+  def code_change(vsn, {_module, heap}, extra) do
+    IO.inspect vsn
+    {old_module, new_module} = case vsn do
+      1 -> {LeftistHeap, BinaryHeap}
+      {:down, 2} -> {BinaryHeap, LeftistHeap}
+    end
+    new_heap = heap
+    |> old_module.to_list()
+    |> new_module.from_list()
+    {:ok, {new_module, new_heap}}
+  end
 
   @impl true
   def init(state), do: {:ok, state}

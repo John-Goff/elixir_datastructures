@@ -64,16 +64,12 @@ heap2.ex examine code
 * Implementation of a binary heap in elixir
 * differences aren't important, only need to know that same rules are in place, and same api
 * We can switch our running GenServer to use this new implementation
-heap_server.ex, replace alias LeftistHeap with alias BinaryHeap, and uncomment second code_change block
 iex> :sys.suspend(ElixirHeap)
-iex> r HeapServer
-iex> :sys.change_code(ElixirHeap, HeapServer, nil, [])
+iex> :sys.change_code(ElixirHeap, HeapServer, 1, [])
 iex> :sys.resume(ElixirHeap)
 iex> :sys.get_state(ElixirHeap)
 * Oh no, we found a bug with the implementation
-* replace the alias, comment the second block and uncomment the first
 iex> :sys.suspend(ElixirHeap)
-iex> r HeapServer
-iex> :sys.change_code(ElixirHeap, HeapServer, nil, [])
+iex> :sys.change_code(ElixirHeap, HeapServer, {:down, 2}, [])
 iex> :sys.resume(ElixirHeap)
 iex> :sys.get_state(ElixirHeap)
