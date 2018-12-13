@@ -50,8 +50,10 @@ defmodule BinaryHeap do
   Return the smallest element in the heap
 
   ## Examples
+  ```
   iex> [3, 7, 2, 4, 7, 1] |> BinaryHeap.from_list() |> BinaryHeap.get_min()
   1
+  ```
   """
   def get_min(%BinaryHeap{min: min}), do: min
   def get_min(:leaf), do: {:err, :leaf}
@@ -59,9 +61,11 @@ defmodule BinaryHeap do
   @doc """
   Returns the size of the heap
 
-  ## Dxamples
+  ## Examples
+  ```
   iex> [1, 2, 3] |> BinaryHeap.from_list() |> BinaryHeap.size()
   3
+  ```
   """
   def size(%BinaryHeap{size: size}), do: size
   def size(:leaf), do: 0
@@ -78,8 +82,8 @@ defmodule BinaryHeap do
   def to_list(:leaf), do: []
   def to_list(%BinaryHeap{} = heap), do: to_list([], heap)
 
-  def to_list(list, :leaf), do: Enum.reverse(list)
-  def to_list(list, heap) do
+  defp to_list(list, :leaf), do: Enum.reverse(list)
+  defp to_list(list, heap) do
     {:ok, min, new_heap} = delete_min(heap)
     to_list([min | list], new_heap)
   end
