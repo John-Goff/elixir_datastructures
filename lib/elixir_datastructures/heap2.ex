@@ -205,3 +205,13 @@ defmodule BinaryHeap do
     end
   end
 end
+
+defimpl Collectable, for: Atom do
+  def into(:leaf) do
+    {:leaf, fn
+      heap, {:cont, x} when is_number(x) -> BinaryHeap.insert(heap, x)
+      heap, :done -> heap
+      _, :halt -> :ok
+    end}
+  end
+end
