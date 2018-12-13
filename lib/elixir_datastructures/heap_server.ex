@@ -1,16 +1,10 @@
 defmodule HeapServer do
   use GenServer
-  alias LeftistHeap, as: Heap
 
-  # Client 
-  def start_link,
-    do: GenServer.start_link(__MODULE__, %Heap{}, name: ElixirHeap)
+  ## Client 
 
-  def start_link(list) when is_list(list),
-    do: GenServer.start_link(__MODULE__, Heap.from_list(list), name: ElixirHeap)
-
-  def start_link(item),
-    do: GenServer.start_link(__MODULE__, Heap.from_key(item), name: ElixirHeap)
+  def start_link(module \\ LeftistHeap, heap \\ nil),
+    do: GenServer.start_link(__MODULE__, {module, heap}, name: ElixirHeap)
 
   def min(), do: GenServer.call(ElixirHeap, :min)
 
@@ -29,43 +23,44 @@ defmodule HeapServer do
     end
   end
 
-  # Callbacks
-  # @impl true
-  # def code_change(_vsn, state, extra) do
-  #   new_state = state
-  #   |> BinaryHeap.to_list()
-  #   |> LeftistHeap.from_list()
-  #   {:ok, new_state}
-  # end
+  ## Callbacks
 
   # @impl true
-  # def code_change(_vsn, state, extra) do
-  #   new_state = state
+  # def code_change(_vsn, {_module, heap}, extra) do
+  #   new_heap = heap
   #   |> LeftistHeap.to_list()
   #   |> BinaryHeap.from_list()
-  #   {:ok, new_state}
+  #   {:ok, {BinaryHeap, new_heap}}
+  # end
+
+  # @impl true
+  # def code_change(_vsn, {_module, heap}, extra) do
+  #   new_heap = heap
+  #   |> BinaryHeap.to_list()
+  #   |> LeftistHeap.from_list()
+  #   {:ok, {LeftistHeap, new_heap}}
   # end
 
   @impl true
-  def init(%Heap{}), do: {:ok, %Heap{}}
+  def init(state), do: {:ok, state}
 
   @impl true
-  def handle_call(:min, _from, heap), do: {:reply, Heap.get_min(heap), heap}
+  def handle_call(:min, _from, {module, heap}), do: {:reply, module.get_min(heap), {module, heap}}
 
   @impl true
-  def handle_call(:size, _from, heap), do: {:reply, Heap.size(heap), heap}
+  def handle_call(:size, _from, {module, heap}), do: {:reply, module.size(heap), {module, heap}}
 
   @impl true
-  def handle_call(:to_list, _from, heap), do: {:reply, Heap.to_list(heap), heap}
+  def handle_call(:to_list, _from, {module, heap}), do: {:reply, module.to_list(heap), {module, heap}}
 
   @impl true
-  def handle_cast({:insert, item}, heap), do: {:noreply, Heap.insert(heap, item)}
+  def handle_cast({:insert, item}, {module, heap}), do: {:noreply, {module, module.insert(heap, item)}}
 
   @impl true
-  def handle_cast(:delete_min, heap) do
-    case Heap.delete_min(heap) do
-      {:ok, _removed, new_heap} -> {:noreply, new_heap}
-      _ -> {:noreply, heap}
+  def handle_cast(:delete_min, {module, heap} = state) do
+    case module.delete_min(heap) do
+      {:ok, _removed, new_heap} -> {:noreply, {module, new_heap}}
+      _ -> {:noreply, state}
     end
   end
 end
