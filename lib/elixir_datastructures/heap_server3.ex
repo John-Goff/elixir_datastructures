@@ -1,4 +1,4 @@
-defmodule HeapServerTwo do
+defmodule HeapServerThree do
   use GenServer
 
   @vsn 1

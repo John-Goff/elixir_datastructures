@@ -138,4 +138,12 @@ defmodule LeftistHeap do
   # Will return 0 for a leaf.
   defp rank(%LeftistHeap{rank: rank}), do: rank
   defp rank(nil), do: 0
+
+  defimpl Heap do
+    def get_min(heap), do: LeftistHeap.get_min(heap)
+    def size(heap), do: LeftistHeap.size(heap)
+    def to_list(heap), do: LeftistHeap.to_list(heap)
+    def insert(heap, item), do: LeftistHeap.insert(heap, item)
+    def delete_min(heap), do: LeftistHeap.delete_min(heap)
+  end
 end

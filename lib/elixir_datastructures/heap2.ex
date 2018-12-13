@@ -186,4 +186,12 @@ defmodule BinaryHeap do
   defp float_right(min, left, %BinaryHeap{min: right_min, left: leftT, right: rightT}) do
     _heap(right_min, left, _heap(min, leftT, rightT))
   end
+
+  defimpl Heap do
+    def get_min(heap), do: BinaryHeap.get_min(heap)
+    def size(heap), do: BinaryHeap.size(heap)
+    def to_list(heap), do: BinaryHeap.to_list(heap)
+    def insert(heap, item), do: BinaryHeap.insert(heap, item)
+    def delete_min(heap), do: BinaryHeap.delete_min(heap)
+  end
 end
