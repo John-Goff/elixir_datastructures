@@ -6,20 +6,20 @@ defmodule HeapServerThree do
   ## Client 
 
   def start_link(heap \\ nil),
-    do: GenServer.start_link(__MODULE__, heap, name: ElixirHeap)
+    do: GenServer.start_link(__MODULE__, heap, name: HSThree)
 
-  def min(), do: GenServer.call(ElixirHeap, :min)
+  def min(), do: GenServer.call(HSThree, :min)
 
-  def size(), do: GenServer.call(ElixirHeap, :size)
+  def size(), do: GenServer.call(HSThree, :size)
 
-  def to_list(), do: GenServer.call(ElixirHeap, :to_list)
+  def to_list(), do: GenServer.call(HSThree, :to_list)
 
-  def insert(item), do: GenServer.cast(ElixirHeap, {:insert, item})
+  def insert(item), do: GenServer.cast(HSThree, {:insert, item})
 
   def delete_min() do
     minimum = min()
 
-    case GenServer.cast(ElixirHeap, :delete_min) do
+    case GenServer.cast(HSThree, :delete_min) do
       :ok -> {:ok, minimum}
       other -> {other}
     end

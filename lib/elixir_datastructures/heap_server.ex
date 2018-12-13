@@ -4,26 +4,26 @@ defmodule HeapServer do
 
   # Client
   def start_link,
-    do: GenServer.start_link(__MODULE__, %LHeap{}, name: ElixirHeap)
+    do: GenServer.start_link(__MODULE__, %LHeap{}, name: HSOne)
 
   def start_link(list) when is_list(list),
-    do: GenServer.start_link(__MODULE__, LHeap.from_list(list), name: ElixirHeap)
+    do: GenServer.start_link(__MODULE__, LHeap.from_list(list), name: HSOne)
 
   def start_link(item),
-    do: GenServer.start_link(__MODULE__, LHeap.from_key(item), name: ElixirHeap)
+    do: GenServer.start_link(__MODULE__, LHeap.from_key(item), name: HSOne)
 
-  def min(), do: GenServer.call(ElixirHeap, :min)
+  def min(), do: GenServer.call(HSOne, :min)
 
-  def size(), do: GenServer.call(ElixirHeap, :size)
+  def size(), do: GenServer.call(HSOne, :size)
 
-  def to_list(), do: GenServer.call(ElixirHeap, :to_list)
+  def to_list(), do: GenServer.call(HSOne, :to_list)
 
-  def insert(item), do: GenServer.cast(ElixirHeap, {:insert, item})
+  def insert(item), do: GenServer.cast(HSOne, {:insert, item})
 
   def delete_min() do
     minimum = min()
 
-    case GenServer.cast(ElixirHeap, :delete_min) do
+    case GenServer.cast(HSOne, :delete_min) do
       :ok -> {:ok, minimum}
       other -> {other}
     end
