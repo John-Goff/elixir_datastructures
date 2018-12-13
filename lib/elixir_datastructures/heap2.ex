@@ -17,25 +17,91 @@ defmodule BinaryHeap do
     height: max(height(left), height(right)) + 1
   }
 
+  @doc """
+  Creates a new heap with the given key.
+
+  ## Examples
+  ```
+  iex> LeftistHeap.from_key(1)
+  %LeftistHeap{key: 1, rank: 1}
+  ```
+  """
   def from_key(min) when is_integer(min), do: _heap(min)
 
+  @doc """
+  Creates a heap from a list.
+
+  ## Examples
+  ```
+  iex> LeftistHeap.from_list([1, 2, 3])
+  %LeftistHeap{key: 1, rank: 2, left: %LeftistHeap{key: 2, rank: 1}, right: %LeftistHeap{key: 3, rank: 1}}
+  ```
+  """
+  def from_list(list) when is_list(list), do: from_list(list, 0)
+
+  defp from_list(list, idx) when idx >= length(list), do: :leaf
+  defp from_list(list, idx) do
+    min = Enum.at(list, idx)
+    bubble_down(min, from_list(list, 2 * idx + 1), from_list(list, 2 * idx + 2))
+  end
+
+  @doc """
+  Creates a heap from a list.
+
+  ## Examples
+  ```
+  iex> LeftistHeap.from_list([1, 2, 3])
+  %LeftistHeap{key: 1, rank: 2, left: %LeftistHeap{key: 2, rank: 1}, right: %LeftistHeap{key: 3, rank: 1}}
+  ```
+  """
   def get_min(%BinaryHeap{min: min}), do: min
   def get_min(:leaf), do: {:err, :leaf}
 
+  @doc """
+  Returns the size of the heap
+
+  ## Dxamples
+  iex> [1, 2, 3] |> LeftistHeap.from_list() |> LeftistHeap.size()
+  3
+  """
   def size(%BinaryHeap{size: size}), do: size
   def size(:leaf), do: 0
 
-  def height(%BinaryHeap{height: height}), do: height
-  def height(:leaf), do: 0
+  @doc """
+  Converts a heap to a list representation
 
-  def bubble_up(min, %BinaryHeap{min: y, left: leftT, right: rightT}, right) when min > y do
-    _heap(y, _heap(min, leftT, rightT), right)
-  end
-  def bubble_up(min, left, %BinaryHeap{min: z, left: leftT, right: rightT}) when min > z do
-    _heap(z, left, _heap(min, leftT, rightT))
-  end
-  def bubble_up(min, left, right), do: _heap(min, left, right)
+  ## Examples
+  ```
+  iex> LeftistHeap.from_key(2) |> LeftistHeap.insert(4) |> LeftistHeap.to_list
+  [2, 4]
+  ```
+  """
+  def to_list(:leaf), do: []
+  def to_list(%BinaryHeap{} = heap), do: to_list([], heap)
 
+  def to_list(list, :leaf), do: Enum.reverse(list)
+  def to_list(list, heap) do
+    {:ok, min, new_heap} = delete_min(heap)
+    to_list([min | list], new_heap)
+  end
+
+  @doc """
+  Inserts an item or a list of items into a heap
+
+  ## Examples
+  ```
+  iex> LeftistHeap.from_key(1) |> LeftistHeap.insert(2)
+  %LeftistHeap{key: 1, rank: 1, left: %LeftistHeap{key: 2, rank: 1}}
+  iex> LeftistHeap.from_key(1) |> LeftistHeap.insert([2, 3])
+  %LeftistHeap{
+    key: 1, rank: 1, left: %LeftistHeap{
+      key: 2, rank: 1, left: %LeftistHeap{
+        key: 3, rank: 1
+      }
+    }
+  }
+  ```
+  """
   def insert(:leaf, item) when is_integer(item), do: _heap(item)
   def insert(%BinaryHeap{left: left, right: right, min: min}, item) when is_integer(item) do
     cond do
@@ -50,34 +116,20 @@ defmodule BinaryHeap do
     end
   end
 
-  def bubble_down(min, %BinaryHeap{min: left_min} = left, %BinaryHeap{min: right_min} = right) when right_min < left_min and min > right_min do
-    _heap(right_min, left, bubble_down(min, right.left, right.right))
-  end
-  def bubble_down(min, %BinaryHeap{min: left_min} = left, right) when min > left_min do
-    _heap(left_min, bubble_down(min, left.left, left.right), right)
-  end
-  def bubble_down(min, left, right), do: _heap(min, left, right)
+  @doc """
+  Removes the smallest element.
 
-  def from_list(list) when is_list(list), do: from_list(list, 0)
-
-  defp from_list(list, idx) when idx >= length(list), do: :leaf
-  defp from_list(list, idx) do
-    min = Enum.at(list, idx)
-    bubble_down(min, from_list(list, 2 * idx + 1), from_list(list, 2 * idx + 2))
-  end
-
-  def to_list(:leaf), do: []
-  def to_list(%BinaryHeap{} = heap), do: to_list([], heap)
-
-  def to_list(list, :leaf), do: Enum.reverse(list)
-  def to_list(list, heap) do
-    {:ok, min, new_heap} = delete_min(heap)
-    to_list([min | list], new_heap)
-  end
-
+  ## Examples
+  ```
+  iex> LeftistHeap.from_list([4, 2, 5]) |> LeftistHeap.delete_min()
+  {:ok, 2, %LeftistHeap{key: 4, rank: 1, left: %LeftistHeap{key: 5, rank: 1}}}
+  iex> LeftistHeap.delete_min(nil)
+  {:err, :empty}
+  ```
+  """
   def delete_min(:leaf), do: {:err, :leaf}
   def delete_min(%BinaryHeap{min: min, left: left, right: right}) do
-    new_heap = case merge_children(left, right) do
+    new_heap = case merge(left, right) do
       :leaf -> :leaf
       %BinaryHeap{min: min, left: leftT, right: rightT} ->
         bubble_down(min, leftT, rightT)
@@ -85,27 +137,46 @@ defmodule BinaryHeap do
     {:ok, min, new_heap}
   end
 
-  def merge_children(:leaf, :leaf), do: :leaf
-  def merge_children(left, right) do
+  defp height(%BinaryHeap{height: height}), do: height
+  defp height(:leaf), do: 0
+
+  defp bubble_up(min, %BinaryHeap{min: y, left: leftT, right: rightT}, right) when min > y do
+    _heap(y, _heap(min, leftT, rightT), right)
+  end
+  defp bubble_up(min, left, %BinaryHeap{min: z, left: leftT, right: rightT}) when min > z do
+    _heap(z, left, _heap(min, leftT, rightT))
+  end
+  defp bubble_up(min, left, right), do: _heap(min, left, right)
+
+  defp bubble_down(min, %BinaryHeap{min: left_min} = left, %BinaryHeap{min: right_min} = right) when right_min < left_min and min > right_min do
+    _heap(right_min, left, bubble_down(min, right.left, right.right))
+  end
+  defp bubble_down(min, %BinaryHeap{min: left_min} = left, right) when min > left_min do
+    _heap(left_min, bubble_down(min, left.left, left.right), right)
+  end
+  defp bubble_down(min, left, right), do: _heap(min, left, right)
+
+  defp merge(:leaf, :leaf), do: :leaf
+  defp merge(left, right) do
     cond do
       size(left) < :math.pow(2, height(left)) - 1 ->
-          float_left(get_min(left), merge_children(left.left, left.right), right)
+          float_left(get_min(left), merge(left.left, left.right), right)
       size(right) < :math.pow(2, height(right)) - 1 ->
-          float_right(get_min(right), left, merge_children(right.left, right.right))
+          float_right(get_min(right), left, merge(right.left, right.right))
       height(right) < height(left) ->
-          float_left(get_min(left), merge_children(left.left, left.right), right)
+          float_left(get_min(left), merge(left.left, left.right), right)
       true ->
-          float_right(get_min(right), left, merge_children(right.left, right.right))
+          float_right(get_min(right), left, merge(right.left, right.right))
     end
   end
 
-  def float_left(min, :leaf, right), do: _heap(min, :leaf, right)
-  def float_left(min, %BinaryHeap{min: left_min, left: leftT, right: rightT}, right) do
+  defp float_left(min, :leaf, right), do: _heap(min, :leaf, right)
+  defp float_left(min, %BinaryHeap{min: left_min, left: leftT, right: rightT}, right) do
     _heap(left_min, _heap(min, leftT, rightT), right)
   end
 
-  def float_right(min, left, :leaf), do: _heap(min, left, :leaf)
-  def float_right(min, left, %BinaryHeap{min: right_min, left: leftT, right: rightT}) do
+  defp float_right(min, left, :leaf), do: _heap(min, left, :leaf)
+  defp float_right(min, left, %BinaryHeap{min: right_min, left: leftT, right: rightT}) do
     _heap(right_min, left, _heap(min, leftT, rightT))
   end
 end
