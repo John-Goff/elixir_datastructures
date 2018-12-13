@@ -194,4 +194,14 @@ defmodule BinaryHeap do
     def insert(heap, item), do: BinaryHeap.insert(heap, item)
     def delete_min(heap), do: BinaryHeap.delete_min(heap)
   end
+
+  defimpl Collectable do
+    def into(original) do
+      {original, fn
+        heap, {:cont, x} when is_integer(x) -> BinaryHeap.insert(heap, x)
+        heap, :done -> heap
+        _, :halt -> :ok
+      end}
+    end
+  end
 end
