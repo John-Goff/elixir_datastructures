@@ -24,7 +24,7 @@ defmodule BinaryHeap do
   ## Examples
   ```
   iex> BinaryHeap.from_key(1)
-  %BinaryHeap{key: 1, rank: 1}
+  %BinaryHeap{min: 1, size: 1}
   ```
   """
   def from_key(min) when is_integer(min), do: _heap(min)
@@ -35,7 +35,7 @@ defmodule BinaryHeap do
   ## Examples
   ```
   iex> BinaryHeap.from_list([1, 2, 3])
-  %BinaryHeap{key: 1, rank: 2, left: %BinaryHeap{key: 2, rank: 1}, right: %BinaryHeap{key: 3, rank: 1}}
+  %BinaryHeap{min: 1, size: 2, left: %BinaryHeap{min: 2, size: 1}, right: %BinaryHeap{min: 3, size: 1}}
   ```
   """
   def from_list(list) when is_list(list), do: from_list(list, 0)
@@ -52,7 +52,7 @@ defmodule BinaryHeap do
   ## Examples
   ```
   iex> BinaryHeap.from_list([1, 2, 3])
-  %BinaryHeap{key: 1, rank: 2, left: %BinaryHeap{key: 2, rank: 1}, right: %BinaryHeap{key: 3, rank: 1}}
+  %BinaryHeap{min: 1, size: 2, left: %BinaryHeap{min: 2, size: 1}, right: %BinaryHeap{min: 3, size: 1}}
   ```
   """
   def get_min(%BinaryHeap{min: min}), do: min
@@ -92,12 +92,12 @@ defmodule BinaryHeap do
   ## Examples
   ```
   iex> BinaryHeap.from_key(1) |> BinaryHeap.insert(2)
-  %BinaryHeap{key: 1, rank: 1, left: %BinaryHeap{key: 2, rank: 1}}
+  %BinaryHeap{min: 1, size: 2, height: 2, left: %BinaryHeap{min: 2, size: 1, height: 1}}
   iex> BinaryHeap.from_key(1) |> BinaryHeap.insert([2, 3])
   %BinaryHeap{
-    key: 1, rank: 1, left: %BinaryHeap{
-      key: 2, rank: 1, left: %BinaryHeap{
-        key: 3, rank: 1
+    min: 1, size: 1, left: %BinaryHeap{
+      min: 2, size: 1, left: %BinaryHeap{
+        min: 3, size: 1
       }
     }
   }
@@ -123,9 +123,9 @@ defmodule BinaryHeap do
   ## Examples
   ```
   iex> BinaryHeap.from_list([4, 2, 5]) |> BinaryHeap.delete_min()
-  {:ok, 2, %BinaryHeap{key: 4, rank: 1, left: %BinaryHeap{key: 5, rank: 1}}}
-  iex> BinaryHeap.delete_min(nil)
-  {:err, :empty}
+  {:ok, 2, %BinaryHeap{min: 4, size: 1, height: 2, left: %BinaryHeap{min: 5, size: 1}}}
+  iex> BinaryHeap.delete_min(:leaf)
+  {:err, :leaf}
   ```
   """
   def delete_min(:leaf), do: {:err, :leaf}
@@ -141,22 +141,33 @@ defmodule BinaryHeap do
   defp height(%BinaryHeap{height: height}), do: height
   defp height(:leaf), do: 0
 
+  # We must preform bubble up operations to maintain the heap order.
+  # First case, violation in left child, swap root and left child
   defp bubble_up(min, %BinaryHeap{min: y, left: leftT, right: rightT}, right) when min > y do
     _heap(y, _heap(min, leftT, rightT), right)
   end
+  # Second case, violation in right child, swap root and right child
   defp bubble_up(min, left, %BinaryHeap{min: z, left: leftT, right: rightT}) when min > z do
     _heap(z, left, _heap(min, leftT, rightT))
   end
+  # Third case, no violations. Rebuild heap.
   defp bubble_up(min, left, right), do: _heap(min, left, right)
 
+  # Bubble down is used for constructing a heap from an unordered list
+  # in order to ensure that a root node is less than it's children.
+  # First case, right child is greater than root, swap root and child and bubble until heap order satisfied.
   defp bubble_down(min, %BinaryHeap{min: left_min} = left, %BinaryHeap{min: right_min} = right) when right_min < left_min and min > right_min do
     _heap(right_min, left, bubble_down(min, right.left, right.right))
   end
+  # Second case, left child is greater than root, swap root and child and bubble until heap order satisfied.
   defp bubble_down(min, %BinaryHeap{min: left_min} = left, right) when min > left_min do
     _heap(left_min, bubble_down(min, left.left, left.right), right)
   end
+  # Third case, no violations, rebuild heap.
   defp bubble_down(min, left, right), do: _heap(min, left, right)
 
+  ## tbh I don't understand this part, you're better off looking at the paper
+  # When removing a node of the heap, we must merge that node's children to obtain a new heap
   defp merge(:leaf, :leaf), do: :leaf
   defp merge(left, right) do
     cond do
@@ -170,6 +181,7 @@ defmodule BinaryHeap do
           float_right(get_min(right), left, merge(right.left, right.right))
     end
   end
+
 
   defp float_left(min, :leaf, right), do: _heap(min, :leaf, right)
   defp float_left(min, %BinaryHeap{min: left_min, left: leftT, right: rightT}, right) do
