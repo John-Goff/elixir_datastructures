@@ -66,6 +66,15 @@ defmodule BinaryHeap do
     bubble_down(min, from_list(list, 2 * idx + 1), from_list(list, 2 * idx + 2))
   end
 
+  def to_list(:leaf), do: []
+  def to_list(%BinaryHeap{} = heap), do: to_list([], heap)
+
+  def to_list(list, :leaf), do: Enum.reverse(list)
+  def to_list(list, heap) do
+    {:ok, min, new_heap} = delete_min(heap)
+    to_list([min | list], new_heap)
+  end
+
   def delete_min(:leaf), do: {:err, :leaf}
   def delete_min(%BinaryHeap{min: min, left: left, right: right}) do
     new_heap = case merge_children(left, right) do
