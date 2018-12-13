@@ -204,6 +204,31 @@ defmodule BinaryHeap do
       end}
     end
   end
+
+  defimpl Enumerable do
+    def count(heap), do: BinaryHeap.size(heap)
+
+    def member?(:leaf, item), do: false
+    def member?(%BinaryHeap{min: min, left: left, right: right} = heap, item) do
+      cond do
+        item < min -> false
+        item === min -> true
+        BinaryHeap.get_min(right) < item -> member?(right, item)
+        BinaryHeap.get_min(left) < item -> member?(left, item)
+        true -> {:error, __MODULE__}
+      end
+    end
+
+    def reduce(_heap, {:halt, acc}, _fun), do: {:halted, acc}
+    def reduce(heap, {:suspend, acc}, fun), do: {:suspended, acc, &reduce(heap, &1, fun)}
+    def reduce(:leaf, {:cont, acc}, _fun), do: {:done, acc}
+    def reduce(heap, {:cont, acc}, fun) do
+      {:ok, min, new_heap} = BinaryHeap.delete_min(heap)
+      reduce(new_heap, fun.(min, acc), fun)
+    end
+
+    def slice(heap), do: {:error, __MODULE__}
+  end
 end
 
 defimpl Collectable, for: Atom do
