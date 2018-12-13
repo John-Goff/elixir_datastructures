@@ -33,6 +33,14 @@ defmodule HeapServer do
   # @impl true
   # def code_change(_vsn, state, extra) do
   #   new_state = state
+  #   |> BinaryHeap.to_list()
+  #   |> LeftistHeap.from_list()
+  #   {:ok, new_state}
+  # end
+
+  # @impl true
+  # def code_change(_vsn, state, extra) do
+  #   new_state = state
   #   |> LeftistHeap.to_list()
   #   |> BinaryHeap.from_list()
   #   {:ok, new_state}
