@@ -34,6 +34,15 @@ defmodule LeftistHeap do
   def from_key(key) when is_integer(key), do: %LeftistHeap{key: key, rank: 1}
 
   @doc """
+  Returns the size of the heap
+
+  ## Dxamples
+  iex> [1, 2, 3] |> LeftistHeap.from_list() |> LeftistHeap.size()
+  3
+  """
+  def size(heap), do: heap |> to_list() |> length()
+
+  @doc """
   Merges two heaps together
 
   ## Examples

@@ -37,7 +37,7 @@ defmodule HeapServer do
   def handle_call(:min, _from, heap), do: {:reply, Heap.get_min(heap), heap}
 
   @impl true
-  def handle_call(:size, _from, heap), do: {:reply, length(Heap.to_list(heap)), heap}
+  def handle_call(:size, _from, heap), do: {:reply, Heap.size(heap), heap}
 
   @impl true
   def handle_call(:to_list, _from, heap), do: {:reply, Heap.to_list(heap), heap}
