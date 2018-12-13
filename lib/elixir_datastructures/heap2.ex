@@ -24,7 +24,7 @@ defmodule BinaryHeap do
   ## Examples
   ```
   iex> BinaryHeap.from_key(1)
-  %BinaryHeap{min: 1, size: 1}
+  %BinaryHeap{min: 1, size: 1, height: 1}
   ```
   """
   def from_key(min) when is_integer(min), do: _heap(min)
@@ -35,7 +35,7 @@ defmodule BinaryHeap do
   ## Examples
   ```
   iex> BinaryHeap.from_list([1, 2, 3])
-  %BinaryHeap{min: 1, size: 2, left: %BinaryHeap{min: 2, size: 1}, right: %BinaryHeap{min: 3, size: 1}}
+  %BinaryHeap{min: 1, size: 3, height: 2, left: %BinaryHeap{min: 2, size: 1, height: 1}, right: %BinaryHeap{min: 3, size: 1, height: 1}}
   ```
   """
   def from_list(list) when is_list(list), do: from_list(list, 0)
@@ -47,13 +47,11 @@ defmodule BinaryHeap do
   end
 
   @doc """
-  Creates a heap from a list.
+  Return the smallest element in the heap
 
   ## Examples
-  ```
-  iex> BinaryHeap.from_list([1, 2, 3])
-  %BinaryHeap{min: 1, size: 2, left: %BinaryHeap{min: 2, size: 1}, right: %BinaryHeap{min: 3, size: 1}}
-  ```
+  iex> [3, 7, 2, 4, 7, 1] |> BinaryHeap.from_list() |> BinaryHeap.get_min()
+  1
   """
   def get_min(%BinaryHeap{min: min}), do: min
   def get_min(:leaf), do: {:err, :leaf}
@@ -93,14 +91,6 @@ defmodule BinaryHeap do
   ```
   iex> BinaryHeap.from_key(1) |> BinaryHeap.insert(2)
   %BinaryHeap{min: 1, size: 2, height: 2, left: %BinaryHeap{min: 2, size: 1, height: 1}}
-  iex> BinaryHeap.from_key(1) |> BinaryHeap.insert([2, 3])
-  %BinaryHeap{
-    min: 1, size: 1, left: %BinaryHeap{
-      min: 2, size: 1, left: %BinaryHeap{
-        min: 3, size: 1
-      }
-    }
-  }
   ```
   """
   def insert(:leaf, item) when is_integer(item), do: _heap(item)
@@ -123,7 +113,7 @@ defmodule BinaryHeap do
   ## Examples
   ```
   iex> BinaryHeap.from_list([4, 2, 5]) |> BinaryHeap.delete_min()
-  {:ok, 2, %BinaryHeap{min: 4, size: 1, height: 2, left: %BinaryHeap{min: 5, size: 1}}}
+  {:ok, 2, %BinaryHeap{min: 4, size: 2, height: 2, left: %BinaryHeap{min: 5, size: 1, height: 1}}}
   iex> BinaryHeap.delete_min(:leaf)
   {:err, :leaf}
   ```
